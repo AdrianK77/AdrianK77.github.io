@@ -1,0 +1,55 @@
+#welcome {
+    background-color: #9e363a;
+    border-radius: 20px;
+    padding: 20px;
+}
+
+#why {
+    background-color: #3d7c47;
+    border-radius: 20px;
+    padding: 20px;
+}
+
+#project {
+    background-color: #be4f0c;
+    border-radius: 20px;
+    padding: 20px;
+}
+
+#contact {
+    background-color: #9bc400;
+    border-radius: 20px;
+    padding: 20px;
+    color:black;
+}
+
+#introGrid {
+    display: grid;
+    grid-template-columns: 50% 50%;
+    gap: 20px;
+    padding: 100px;
+}
+
+.center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+#skillSection {
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+}
+
+.carousel {
+    width: 50%;
+}
+
+.Grid {
+    display: grid;
+    grid-template-columns: 50% 50%;
+    gap: 20px;
+    padding: 100px;
+}

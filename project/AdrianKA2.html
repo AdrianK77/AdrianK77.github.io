@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Adrian's Auto Dealer Hub </title>
+    <link href = "A2Style.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+    <!--StAuth10244: I Adrian Kobylt, 000833903 certify that this material is my original work. No other person's work has been used without due acknowledgement. I have not made my work available to anyone else. -->
+  </head>
+<body>
+    <!-- Nav bar Section -->
+    <nav class="navbar navbar-dark bg-dark fixed-top">
+        <div class="container-fluid">
+          <div>
+            <a class="navbar-brand" href="#"> Adrian's Auto Dealer Hub </a>
+          
+            <div>
+              <button type="button" class="btn btn-primary" id = "europeanBTN" style="background-color:  #FF5C00; color: white; border: black;"> European </button>
+              <button type="button" class="btn btn-primary" id = "americanBTN" style="background-color:  #FF5C00; color: white; border: black;"> American </button>
+              <button type="button" class="btn btn-primary" id = "japaneseBTN" style="background-color:  #FF5C00; color: white; border: black;"> Japanese </button>
+              <button type="button" class="btn btn-primary" id = "showallBTN" style="background-color:  #FF5C00; color: white; border: black;"> Show All </button>
+              <button type="button" class="btn btn-primary" id = "findmeBTN" style="background-color:  #FF5C00; color: white; border: black;"> Find Me </button>
+            </div>
+          </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasDarkNavbar" aria-controls="offcanvasDarkNavbar" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="offcanvas offcanvas-end text-bg-dark" tabindex="-1" id="offcanvasDarkNavbar" aria-labelledby="offcanvasDarkNavbarLabel">
+            <div class="offcanvas-header">
+              <h5 class="offcanvas-title" id="offcanvasDarkNavbarLabel"> Navigation </h5>
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+              <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <strong>Destinations</strong>
+                  </a>
+                  <ul class="dropdown-menu dropdown-menu-dark">
+                    <li><h6> European Dealerships </h6></li>
+                    <li><a class="dropdown-item" id = "toBMW" href="#"> Budds' BMW Hamilton </a></li>
+                    <li><a class="dropdown-item" id = "toAUDI" href="#"> Audi Hamilton </a></li>
+                    <li>
+                      <hr class="dropdown-divider">
+                    </li>
+                    <li><h6> American Dealerships </h6></li>
+                    <li><a class="dropdown-item" id = "toMFORD" href="#"> Mohawk Ford </a></li>
+                    <li><a class="dropdown-item" id = "toEFORD" href="#"> Eastgate Ford </a></li>
+                    <li><a class="dropdown-item" id = "toDEWILDT" href="#"> Dewildt Chrysler Dodge Jeep Ram </a></li>
+                    <li><a class="dropdown-item" id = "toFAIRVIEW" href="#"> Fairview Chrysler Dodge Limited </a></li>
+                    <li><a class="dropdown-item" id = "toQUEENSTON" href="#"> Queenston Chevrolet Buick GMC </a></li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li><h6> Japanese Dealerships </h6></li>
+                    <li><a class="dropdown-item" id = "toMAZDA" href="#"> Leggat Mazda Burlington </a></li>
+                    <li><a class="dropdown-item" id = "toSUBARU" href="#"> Subaru of Hamilton </a></li>
+                    <li><a class="dropdown-item" id = "toHONDA" href="#"> Image Honda </a></li>
+                  </ul>
+                </li>
+                <li class="nav-item">
+                  <p><a class="nav-link" aria-current="page"> Not in the list above? You an input a location below </a></p>
+                </li>
+              </ul>
+              <form class="d-flex mt-3" role="search">
+                <input class="form-control me-2" type="text" id = "userAddress" placeholder="Search" aria-label="Search">
+                <button class="btn btn-success" type="button" id = "inputFinderBTN" style="background-color:  #FF5C00; color: white; border: black;">Search</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <!-- Map Section -->
+      
+      <div id="map"></div>
+      <script
+      async
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyABcbQ-fNnJW5L4nn1f60mzpMHkkHAd1uU&loading=async&callback=initMap&libraries=marker"></script>
+
+    <!-- Map mechanism section -->
+    <!-- Code has taken reference from the example codes used in class and provided by the class for Mobile Web Programming at Mohawk College -->
+    <script src="dealershipMarker.js"></script>
+    <script>
+
+      // all variables to be set global
+      let map;
+      let markers = [];
+      let infoWindow;
+      let geocoder;
+      let directionsService;
+      let directionsRender;
+
+      /**
+       * Main function that allows the map to show up on the html page and provides already pre-made marker locations for some dealerships
+       */
+      function initMap() {
+        map = new google.maps.Map(document.getElementById("map"), {
+          center: { lat: 43.27967802441868, lng: -79.80319031445488 },
+          zoom: 12,
+          mapId: "MAP_ID_GOES_HERE",
+        });
+
+        directionsService = new google.maps.DirectionsService(); // gets the directions service working
+        directionsRenderer = new google.maps.DirectionsRenderer({suppressMarkers: true}); // gets the render direction working and prevents default markers from showing
+
+        geocoder = new google.maps.Geocoder(); // gets the geocoder working
+        
+        infoWindow = new google.maps.InfoWindow(); // gets the info window working
+        
+        // sets the marker icon for the respected dealerships based on category
+        for (i = 0; i < dealershipMarker.length; i++) {
+          let icon;
+          if(dealershipMarker[i].CATEGORY == "American_Dealership") {
+            icon = "https://maps.google.com/mapfiles/kml/paddle/blu-diamond.png";
+          }
+          else if (dealershipMarker[i].CATEGORY == "Japanese_Dealership") {
+            icon = "https://maps.google.com/mapfiles/kml/paddle/grn-diamond.png";
+          }
+          else if (dealershipMarker[i].CATEGORY == "European_Dealership") {
+            icon = "https://maps.google.com/mapfiles/kml/paddle/red-diamond.png";
+          }
+        
+          // sets the marker icon for the dealerships
+          const iconContent = document.createElement("img");
+          iconContent.src = icon;
+
+          // creates the markers for the dealerships
+          const newMarker = new google.maps.marker.AdvancedMarkerElement({
+            map: map,
+            position: {
+              lat: dealershipMarker[i].LATITUDE,
+              lng: dealershipMarker[i].LONGITUDE,
+            },
+            title: dealershipMarker[i].NAME,
+            content: iconContent,
+          });
+
+          newMarker.CATEGORY = dealershipMarker[i].CATEGORY
+          markers.push(newMarker); // adds to array
+          infowindowMarker(newMarker, i); // creates an info window for the markers
+       }
+
+      }
+
+      /**
+       * This functions handles having the premade markers have filled content for the infowindow and creates a "click" listener for each marker
+       */
+      function infowindowMarker(dealerMarker, i) {
+
+        // Below is a link for the reference code of using imbedded variable values in creating a string
+        // https://stackoverflow.com/questions/3304014/how-to-interpolate-variables-in-strings-in-javascript-without-concatenation
+            // makes each dealership marker be clickable to see an info window
+            dealerMarker.addListener("click", function () {
+
+              // A variable that will contain the content info of the dealership to be placed in its info window
+              const dealershipInfo = 
+              `
+                <h6> ${dealershipMarker[i].NAME} </h6>
+                <p> ${dealershipMarker[i].ADDRESS} </p>
+                <p> ${dealershipMarker[i].COMMENTS} </p>
+                <p> <a href="${dealershipMarker[i].WEBSITE}"> Dealership Website </a></p>
+              `;
+
+              infoWindow.setContent(dealershipInfo);
+              infoWindow.open({
+                  anchor: dealerMarker,
+                  shouldFocus: false,
+              });
+           });
+        }
+
+      /**
+       * this function is for filtering the all the markers to only show the european dealerships
+      */
+      document.getElementById("europeanBTN").addEventListener("click", showEuroDealer)
+       function showEuroDealer() {
+        // for loop that goes throw the array and checks if dealership at a specific index satisfies the if statement, and if not then it will be removed from the map
+        for (i = 0; i < markers.length; i++) {
+          if (markers[i].CATEGORY == "European_Dealership") {
+            markers[i].position = {
+              lat: dealershipMarker[i].LATITUDE,
+              lng: dealershipMarker[i].LONGITUDE,
+            }
+          } else {
+            markers[i].position = null;
+          }
+        }
+       }
+
+       /**
+       * this function is for filtering the all the markers to only show the american dealerships
+      */
+       document.getElementById("americanBTN").addEventListener("click", showUSDealer)
+       function showUSDealer() {
+        for (i = 0; i < markers.length; i++) {
+          if (markers[i].CATEGORY == "American_Dealership") {
+            markers[i].position = {
+              lat: dealershipMarker[i].LATITUDE,
+              lng: dealershipMarker[i].LONGITUDE,
+            }
+          } else {
+            markers[i].position = null;
+          }
+        }
+       }
+
+       /**
+       * this function is for filtering the all the markers to only show the japanese dealerships
+      */
+       document.getElementById("japaneseBTN").addEventListener("click", showJapanDealer)
+       function showJapanDealer() {
+        for (i = 0; i < markers.length; i++) {
+          if (markers[i].CATEGORY == "Japanese_Dealership") {
+            markers[i].position = {
+              lat: dealershipMarker[i].LATITUDE,
+              lng: dealershipMarker[i].LONGITUDE,
+            }
+          } else {
+            markers[i].position = null;
+          }
+        }
+       }
+
+       /**
+       * this function is for showing all the markers of all dealerships
+      */
+       document.getElementById("showallBTN").addEventListener("click", showAllDealer)
+       function showAllDealer() {
+        for (i = 0; i < markers.length; i++) {        
+          markers[i].position = {
+            lat: dealershipMarker[i].LATITUDE,
+            lng: dealershipMarker[i].LONGITUDE,
+          }
+       }
+      }
+
+      /**
+       * this function is for find users location and make a marker to show their location
+      */
+      document.getElementById("findmeBTN").addEventListener("click", findUser)
+      let userPosition; // global variable
+       function findUser() {
+          if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+              // finds users position
+              (position) => {
+                const pos = {
+                  lat: position.coords.latitude,
+                  lng: position.coords.longitude,
+                };
+
+                // this section saves the users location to be used globally
+                const userLat = pos.lat;
+                const userLng = pos.lng;
+                userPosition = { latitude: userLat, longitude: userLng};
+
+                // notifies the user that their location has been found with an info window
+                infoWindow.setPosition(pos);
+                infoWindow.setContent("You are here!");
+                infoWindow.open(map);
+                map.setCenter(pos);
+
+                // Below is a link for the reference code of using google.maps.Marker
+                // https://developers.google.com/maps/documentation/javascript/markers#maps_marker_simple-javascript
+                // makes a marker on the map of the users position
+                const userMarker = new google.maps.Marker({
+                  map: map,
+                  position: pos,
+                  title: "Your location",
+                  icon: "https://maps.google.com/mapfiles/kml/paddle/orange-stars.png"
+                });
+              }
+            );
+            
+          } else {
+            // sends an error if they was a failure
+            alert("Error: Location was either denied, not avaliable, timed out, or geolocation is not supported by this browser.")
+          }
+        }
+
+        /**
+       * This function deals with finding and making a marker based on the users input in a text field
+      */
+        document.getElementById("inputFinderBTN").addEventListener("click", findUserInput)
+        let userInput; // global variable that will contain the inputed location
+        function findUserInput() {
+          userInput = document.getElementById("userAddress").value;
+          geocoder.geocode({
+            address: userInput},
+            function(userResults, status) {
+              // checks if its not null
+              if (status == 'OK') {
+
+                // creates an info window to let the user know the location inputed was found
+                infoWindow.setPosition(userResults[0].geometry.location);
+                infoWindow.setContent("Inputed location found!");
+                infoWindow.open(map);
+
+                // makes a marker on the map of the users inputed location
+                const userMarker = new google.maps.Marker({
+                  map: map,
+                  position: userResults[0].geometry.location,
+                  title: "Inputed location: " + userInput,
+                  icon: "https://maps.google.com/mapfiles/kml/paddle/purple-blank.png"
+                });
+
+                // Below is a link for the reference code of using .addListener
+                // https://developers.google.com/maps/documentation/javascript/events
+                // this sections makes the users input location marker be clickable and have an infowindow
+                userMarker.addListener("click", function() {
+                  const locationInfo = 
+                  `
+                    <h6>${userInput}</h6>
+                    <button type="button" id = "toMarker" style="background-color:  #FF5C00; color: white; border: black;"> Directions </button>
+                  `;
+
+                  infoWindow.setContent(locationInfo);
+                  infoWindow.open({
+                      anchor: userMarker,
+                      shouldFocus: false,
+                  });
+
+                  // adds a click listener to the marker of the user inputed location
+                  document.getElementById("toMarker").addEventListener("click", directionstoNewMarker)
+                });
+
+                
+              } else {
+                alert("GeoCode was not successful. Reason: " + status);
+              }
+
+            }
+          );
+        }
+
+       /**
+       * This function is for creating a navigation route from the user's location to the user's inputed location
+      */
+       function directionstoNewMarker() {
+        directionsRenderer.setMap(map);
+
+        // creates a request start and end point of users location to the BMW dealership
+        // reference code is from https://developers.google.com/maps/documentation/javascript/examples/directions-travel-modes
+        const request = {
+                origin: {lat: userPosition.latitude, lng: userPosition.longitude},
+                destination: userInput,
+                travelMode: 'DRIVING'
+            }
+      
+           directionsService.route(request, function(directionResult, status) {
+              if (status == 'OK') {
+                  directionsRenderer.setDirections(directionResult)
+              }
+          })
+      }
+
+      /**
+       * This function is to place the direction/navigation from users location to BMW dealership
+      */
+       document.getElementById("toBMW").addEventListener("click", directionstoBMW)
+       function directionstoBMW() {
+        directionsRenderer.setMap(map);
+
+        if (userPosition == null) {
+          alert("You have not set your location!");
+        } else {
+        // creates a request start and end point of users location to the BMW dealership
+        // reference code is from https://developers.google.com/maps/documentation/javascript/examples/directions-travel-modes
+        const request = {
+                origin: {lat: userPosition.latitude, lng: userPosition.longitude},
+                destination: {lat: dealershipMarker[0].LATITUDE, lng: dealershipMarker[0].LONGITUDE},
+                travelMode: 'DRIVING'
+            }
+      
+           directionsService.route(request, function(directionResult, status) {
+              if (status == 'OK') {
+                  directionsRenderer.setDirections(directionResult)
+              }
+          })
+        }
+      }
+
+      /**
+       * This function is to place the direction/navigation from users location to Audi dealership
+      */
+      document.getElementById("toAUDI").addEventListener("click", directionstoAudi)
+       function directionstoAudi() {
+        directionsRenderer.setMap(map);
+
+        if (userPosition == null) {
+          alert("You have not set your location!");
+        } else {
+        // creates a request start and end point of users location to the Audi dealership
+        // reference code is from https://developers.google.com/maps/documentation/javascript/examples/directions-travel-modes
+        const request = {
+                origin: {lat: userPosition.latitude, lng: userPosition.longitude},
+                destination: {lat: dealershipMarker[1].LATITUDE, lng: dealershipMarker[1].LONGITUDE},
+                travelMode: 'DRIVING'
+            }
+      
+           directionsService.route(request, function(directionResult, status) {
+              if (status == 'OK') {
+                  directionsRenderer.setDirections(directionResult)
+              }
+          })
+        }
+      }
+
+      /**
+       * This function is to place the direction/navigation from users location to Mazda dealership
+      */
+      document.getElementById("toMAZDA").addEventListener("click", directionstoMazda)
+       function directionstoMazda() {
+        directionsRenderer.setMap(map);
+
+        if (userPosition == null) {
+          alert("You have not set your location!");
+        } else {
+        // creates a request start and end point of users location to the Mazda dealership
+        // reference code is from https://developers.google.com/maps/documentation/javascript/examples/directions-travel-modes
+        const request = {
+                origin: {lat: userPosition.latitude, lng: userPosition.longitude},
+                destination: {lat: dealershipMarker[2].LATITUDE, lng: dealershipMarker[2].LONGITUDE},
+                travelMode: 'DRIVING'
+            }
+      
+           directionsService.route(request, function(directionResult, status) {
+              if (status == 'OK') {
+                  directionsRenderer.setDirections(directionResult)
+              }
+          })
+        }
+      }
+
+      /**
+       * This function is to place the direction/navigation from users location to Subaru dealership
+      */
+      document.getElementById("toSUBARU").addEventListener("click", directionstoSubaru)
+       function directionstoSubaru() {
+        directionsRenderer.setMap(map);
+
+        if (userPosition == null) {
+          alert("You have not set your location!");
+        } else {
+        // creates a request start and end point of users location to the Subaru dealership
+        // reference code is from https://developers.google.com/maps/documentation/javascript/examples/directions-travel-modes
+        const request = {
+                origin: {lat: userPosition.latitude, lng: userPosition.longitude},
+                destination: {lat: dealershipMarker[3].LATITUDE, lng: dealershipMarker[3].LONGITUDE},
+                travelMode: 'DRIVING'
+            }
+      
+           directionsService.route(request, function(directionResult, status) {
+              if (status == 'OK') {
+                  directionsRenderer.setDirections(directionResult)
+              }
+          })
+        }
+      }
+
+      /**
+       * This function is to place the direction/navigation from users location to Honda dealership
+      */
+      document.getElementById("toHONDA").addEventListener("click", directionstoHonda)
+       function directionstoHonda() {
+        directionsRenderer.setMap(map);
+
+        if (userPosition == null) {
+          alert("You have not set your location!");
+        } else {
+        // creates a request start and end point of users location to the Honda dealership
+        // reference code is from https://developers.google.com/maps/documentation/javascript/examples/directions-travel-modes
+        const request = {
+                origin: {lat: userPosition.latitude, lng: userPosition.longitude},
+                destination: {lat: dealershipMarker[4].LATITUDE, lng: dealershipMarker[4].LONGITUDE},
+                travelMode: 'DRIVING'
+            }
+      
+           directionsService.route(request, function(directionResult, status) {
+              if (status == 'OK') {
+                  directionsRenderer.setDirections(directionResult)
+              }
+          })
+        }
+      }
+
+      /**
+       * This function is to place the direction/navigation from users location to Mohawk Ford dealership
+      */
+      document.getElementById("toMFORD").addEventListener("click", directionstoMohawkFord)
+       function directionstoMohawkFord() {
+        directionsRenderer.setMap(map);
+
+        if (userPosition == null) {
+          alert("You have not set your location!");
+        } else {
+        // creates a request start and end point of users location to the Mohawk Ford dealership
+        // reference code is from https://developers.google.com/maps/documentation/javascript/examples/directions-travel-modes
+        const request = {
+                origin: {lat: userPosition.latitude, lng: userPosition.longitude},
+                destination: {lat: dealershipMarker[5].LATITUDE, lng: dealershipMarker[5].LONGITUDE},
+                travelMode: 'DRIVING'
+            }
+      
+           directionsService.route(request, function(directionResult, status) {
+              if (status == 'OK') {
+                  directionsRenderer.setDirections(directionResult)
+              }
+          })
+        }
+      }
+
+      /**
+       * This function is to place the direction/navigation from users location to Eastgate Ford dealership
+      */
+      document.getElementById("toEFORD").addEventListener("click", directionstoEastgateFord)
+       function directionstoEastgateFord() {
+        directionsRenderer.setMap(map);
+
+        if (userPosition == null) {
+          alert("You have not set your location!");
+        } else {
+        // creates a request start and end point of users location to the Eastgate Ford dealership
+        // reference code is from https://developers.google.com/maps/documentation/javascript/examples/directions-travel-modes
+        const request = {
+                origin: {lat: userPosition.latitude, lng: userPosition.longitude},
+                destination: {lat: dealershipMarker[6].LATITUDE, lng: dealershipMarker[6].LONGITUDE},
+                travelMode: 'DRIVING'
+            }
+      
+           directionsService.route(request, function(directionResult, status) {
+              if (status == 'OK') {
+                  directionsRenderer.setDirections(directionResult)
+              }
+          })
+        }
+      }
+
+      /**
+       * This function is to place the direction/navigation from users location to Dewildt dealership
+      */
+      document.getElementById("toDEWILDT").addEventListener("click", directionstoDewildt)
+       function directionstoDewildt() {
+        directionsRenderer.setMap(map);
+
+        if (userPosition == null) {
+          alert("You have not set your location!");
+        } else {
+        // creates a request start and end point of users location to the Dewildt dealership
+        // reference code is from https://developers.google.com/maps/documentation/javascript/examples/directions-travel-modes
+        const request = {
+                origin: {lat: userPosition.latitude, lng: userPosition.longitude},
+                destination: {lat: dealershipMarker[7].LATITUDE, lng: dealershipMarker[7].LONGITUDE},
+                travelMode: 'DRIVING'
+            }
+      
+           directionsService.route(request, function(directionResult, status) {
+              if (status == 'OK') {
+                  directionsRenderer.setDirections(directionResult)
+              }
+          })
+        }
+      }
+
+      /**
+       * This function is to place the direction/navigation from users location to Fairview dealership
+      */
+      document.getElementById("toFAIRVIEW").addEventListener("click", directionstoFairview)
+       function directionstoFairview() {
+        directionsRenderer.setMap(map);
+
+        if (userPosition == null) {
+          alert("You have not set your location!");
+        } else {
+        // creates a request start and end point of users location to the Fairview dealership
+        // reference code is from https://developers.google.com/maps/documentation/javascript/examples/directions-travel-modes
+        const request = {
+                origin: {lat: userPosition.latitude, lng: userPosition.longitude},
+                destination: {lat: dealershipMarker[8].LATITUDE, lng: dealershipMarker[8].LONGITUDE},
+                travelMode: 'DRIVING'
+            }
+      
+           directionsService.route(request, function(directionResult, status) {
+              if (status == 'OK') {
+                  directionsRenderer.setDirections(directionResult)
+              }
+          })
+        }
+      }
+
+      /**
+       * This function is to place the direction/navigation from users location to Queenston dealership
+      */
+      document.getElementById("toQUEENSTON").addEventListener("click", directionstoQueenston)
+       function directionstoQueenston() {
+        directionsRenderer.setMap(map);
+
+        if (userPosition == null) {
+          alert("You have not set your location!");
+        } else {
+        // creates a request start and end point of users location to the Queenston dealership
+        // reference code is from https://developers.google.com/maps/documentation/javascript/examples/directions-travel-modes
+        const request = {
+                origin: {lat: userPosition.latitude, lng: userPosition.longitude},
+                destination: {lat: dealershipMarker[9].LATITUDE, lng: dealershipMarker[9].LONGITUDE},
+                travelMode: 'DRIVING'
+            }
+      
+           directionsService.route(request, function(directionResult, status) {
+              if (status == 'OK') {
+                  directionsRenderer.setDirections(directionResult)
+              }
+          })
+        }
+      }
+    </script>
+
+    <!-- Bootstrap link -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  </body>
+</html>
